@@ -17,11 +17,11 @@ module.exports = function validateRegisterInput(data) {
     errors.email = "Invalid email";
   }
 
-  if (!Validator.isEmpty(data.email)) {
+  if (Validator.isEmpty(data.email)) {
     errors.email = "Email is required";
   }
 
-  if (!Validator.isEmpty(data.password)) {
+  if (Validator.isEmpty(data.password)) {
     errors.password = "Password is required";
   }
 
@@ -29,7 +29,7 @@ module.exports = function validateRegisterInput(data) {
     errors.password = "Password must be at least 6 characters";
   }
 
-  if (!Validator.isEmpty(data.password2)) {
+  if (Validator.isEmpty(data.password2)) {
     errors.password2 = "Password confirmation field is required";
   }
 

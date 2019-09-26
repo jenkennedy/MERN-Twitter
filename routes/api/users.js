@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const User = require('../../models/User');
 const validateLoginInput = require('../../validation/login');
 const validateRegisterInput = require('../../validation/register');
+const jwt = require('jsonwebtoken');
+const keys = require('../../config/keys');
 
 router.get("/test", (req, res) => res.json({msg: "test router is working"}));
 
@@ -42,11 +44,11 @@ router.post("/login", (req, res) => {
   const {errors, isValid} = validateLoginInput(req.body);
 
   if (!isValid) {
-    return req.status(400).json(errors);
+    return res.status(400).json(errors);
   }
 
-  const email = req.data.email;
-  const password = req.data.password;
+  const email = req.body.email;
+  const password = req.body.password;
 
   User.findOne({email})
     .then(user => {
@@ -56,6 +58,25 @@ router.post("/login", (req, res) => {
       }
 
       bcrypt.compare(password, user.password)
+        .then(isMatch => {
+          if (isMatch) {
+            const payload = {id: user.id, email: user.email};
+
+            jwt.sign(
+              payload,
+              keys.secretOrKey,
+              {expiresIn: 3600},
+              (err, token) => {
+                res.json({
+                  success: true,
+                  token: 'Bearer' + token
+                });
+              }
+            )
+          } else {
+            return res.status(400).json({password: "Incorrect password"})
+          }
+        })
     })
 })
 
